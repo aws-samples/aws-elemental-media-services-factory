@@ -1,2 +1,7 @@
-# aws-elemental-media-services-factory
+## AWS Elemental Media Services Factory
+
 Used to write AWS Step Functions state machines that stitch together Elemental Media Services.
+
+## License Summary
+
+This sample code is made available under a modified MIT license. See the LICENSE file.
