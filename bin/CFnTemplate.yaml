@@ -1,0 +1,383 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "An AWS Elemental Media Services sample stack to build off of."
+Resources:
+  AWSElementalMediaServicesRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "AWSElementalMediaServicesRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+          - Effect: "Allow"
+            Principal:
+              Service: medialive.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSElementalMediaPackageFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
+      Policies:
+        - PolicyName: MediaLiveCustomPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "medialive:*"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                  - "s3:DeleteObject"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "mediastore:ListContainers"
+                  - "mediastore:PutObject"
+                  - "mediastore:GetObject"
+                  - "mediastore:DeleteObject"
+                  - "mediastore:DescribeObject"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "logs:DescribeLogStreams"
+                  - "logs:DescribeLogGroups"
+                Resource: "*"
+        - PolicyName: IAMCustomPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "iam:PassRole"
+                Resource: "*"
+                
+  MediaLiveAttachRole:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveAttachRole"
+      Handler: "index.handler"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        "ZipFile":  { "Fn::Join": ["", [
+          "exports.handler = function(event, context, callback){ callback(null, '",
+          !GetAtt [ AWSElementalMediaServicesRole, Arn ],
+          "'); };"
+        ]]}
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+
+  MediaPackageCreateChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaPackageCreateChannel"
+      Handler: "mediapackage.createChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaPackageCreateEndpoints:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaPackageCreateEndpoints"
+      Handler: "mediapackage.createEndpoints"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaPackageDeleteChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaPackageDeleteChannel"
+      Handler: "mediapackage.deleteChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaPackageDeleteEndpoints:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaPackageDeleteEndpoints"
+      Handler: "mediapackage.deleteEndpoints"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+
+  SystemsManagerCreateParameters:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "SystemsManagerCreateParameters"
+      Handler: "systemsmanager.createParameters"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  SystemsManagerDeleteParameters:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "SystemsManagerDeleteParameters"
+      Handler: "systemsmanager.deleteParamaters"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveCreateInput:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveCreateInput"
+      Handler: "medialive.createInput"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveCreateChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveCreateChannel"
+      Handler: "medialive.createChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveDescribeChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveDescribeChannel"
+      Handler: "medialive.describeChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveDescribeInput:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveDescribeInput"
+      Handler: "medialive.describeInput"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveStartChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveStartChannel"
+      Handler: "medialive.startChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveStopChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveStopChannel"
+      Handler: "medialive.stopChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveFindChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveFindChannel"
+      Handler: "medialive.findChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveDeleteChannel:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveDeleteChannel"
+      Handler: "medialive.deleteChannel"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+      
+  MediaLiveDeleteInput:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "MediaLiveDeleteInput"
+      Handler: "medialive.deleteInput"
+      Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+      Code:
+        S3Bucket: "awsmediafunctions"
+        S3Key: "mediafunctions.zip"
+      Runtime: "nodejs8.10"
+      Timeout: "30"
+
+  AWSElementalMediaServiceFunctions:
+    Type: "AWS::StepFunctions::StateMachine"
+    Properties:
+      DefinitionString:
+        !Sub
+          - |-
+            {
+              "Comment": "An example of the MediaLive to MediaPackage workflow",
+              "StartAt": "MediaPackageCreateChannel",
+              "States": {
+                "MediaPackageCreateChannel": {
+                  "Type": "Task",
+                  "Resource": "${mediapackageCreateChannelArn}",
+                  "InputPath": "$.name",
+                  "ResultPath": "$.mediapackage.channel",
+                  "Next": "MediaPackageCreateEndpoints"
+                },
+                "MediaPackageCreateEndpoints": {
+                  "Type": "Task",
+                  "Resource": "${mediapackageCreateEndpointsArn}",
+                  "InputPath": "$.mediapackage.channel",
+                  "ResultPath": "$.mediapackage.endpoints",
+                  "Next": "SystemsManagerCreateParameters"
+                },
+                "SystemsManagerCreateParameters": {
+                  "Type": "Task",
+                  "Resource": "${systemsmanagerCreateParametersArn}",
+                  "InputPath": "$.mediapackage.channel",
+                  "ResultPath": "$.systemsmanager.parameters",
+                  "Next": "MediaLiveAttachRole"
+                },
+                "MediaLiveAttachRole": {
+                  "Type": "Task",
+                  "Resource": "${medialiveAttachRoleArn}",
+                  "ResultPath": "$.medialive.roleArn",
+                  "Next": "MediaLiveCreateInput"
+                },
+                "MediaLiveCreateInput": {
+                  "Type": "Task",
+                  "Resource": "${medialiveCreateInputArn}",
+                  "InputPath": "$.name",
+                  "ResultPath": "$.medialive.input",
+                  "Next": "MediaLiveCreateChannel"
+                },
+                "MediaLiveCreateChannel": {
+                  "Type": "Task",
+                  "Resource": "${medialiveCreateChannelArn}",
+                  "InputPath": "$",
+                  "ResultPath": "$.medialive.channel",
+                  "Next": "WaitForIdleState"
+                },
+                "WaitForIdleState": {
+                  "Type": "Wait",
+                  "Seconds": 1,
+                  "Next": "MediaLiveDescribeChannel1"
+                },
+                "MediaLiveDescribeChannel1": {
+                  "Type": "Task",
+                  "Resource": "${medialiveDescribeChannelArn}",
+                  "InputPath": "$.medialive.channel.Id",
+                  "ResultPath": "$.medialive.channel",
+                  "Next": "IsMediaLiveChannelIdle"
+                },
+                "IsMediaLiveChannelIdle": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.medialive.channel.State",
+                      "StringEquals": "IDLE",
+                      "Next": "MediaLiveStartChannel"
+                    }
+                  ],
+                  "Default": "WaitForIdleState"
+                },
+                "MediaLiveStartChannel": {
+                  "Type": "Task",
+                  "Resource": "${medialiveStartChannelArn}",
+                  "InputPath": "$.medialive.channel.Id",
+                  "ResultPath": null,
+                  "Next": "WaitForRunningState"
+                },
+                "WaitForRunningState": {
+                  "Type": "Wait",
+                  "Seconds": 5,
+                  "Next": "MediaLiveDescribeChannel2"
+                },
+                "MediaLiveDescribeChannel2": {
+                  "Type": "Task",
+                  "Resource": "${medialiveDescribeChannelArn}",
+                  "InputPath": "$.medialive.channel.Id",
+                  "ResultPath": "$.medialive.channel",
+                  "Next": "IsMediaLiveChannelRunning"
+                },
+                "IsMediaLiveChannelRunning": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.medialive.channel.State",
+                      "StringEquals": "RUNNING",
+                      "Next": "Done"
+                    }
+                  ],
+                  "Default": "WaitForRunningState"
+                },
+                "Done": {
+                  "Type": "Pass",
+                  "End": true
+                }
+              }
+            }
+          - 
+            {
+              mediapackageCreateChannelArn: !GetAtt [ MediaPackageCreateChannel, Arn ], 
+              mediapackageCreateEndpointsArn: !GetAtt [ MediaPackageCreateEndpoints, Arn ],
+              systemsmanagerCreateParametersArn: !GetAtt [ SystemsManagerCreateParameters, Arn ],
+              medialiveAttachRoleArn: !GetAtt [ MediaLiveAttachRole, Arn ],
+              medialiveCreateInputArn: !GetAtt [ MediaLiveCreateInput, Arn ],
+              medialiveCreateChannelArn: !GetAtt [ MediaLiveCreateChannel, Arn ],
+              medialiveDescribeChannelArn: !GetAtt [ MediaLiveDescribeChannel, Arn ],
+              medialiveStartChannelArn: !GetAtt [ MediaLiveStartChannel, Arn ]
+            }
+      RoleArn: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
