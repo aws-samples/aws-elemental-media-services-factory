@@ -143,7 +143,7 @@ Resources:
     Type: "AWS::Lambda::Function"
     Properties:
       FunctionName: "SystemsManagerDeleteParameters"
-      Handler: "systemsmanager.deleteParamaters"
+      Handler: "systemsmanager.deleteParameters"
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
       Code:
         S3Bucket: "awsmediafunctions"
@@ -259,7 +259,7 @@ Resources:
       Runtime: "nodejs8.10"
       Timeout: "30"
 
-  AWSElementalMediaServiceFunctions:
+  AWSElementalMediaServiceCreate:
     Type: "AWS::StepFunctions::StateMachine"
     Properties:
       DefinitionString:
@@ -379,5 +379,106 @@ Resources:
               medialiveCreateChannelArn: !GetAtt [ MediaLiveCreateChannel, Arn ],
               medialiveDescribeChannelArn: !GetAtt [ MediaLiveDescribeChannel, Arn ],
               medialiveStartChannelArn: !GetAtt [ MediaLiveStartChannel, Arn ]
+            }
+      RoleArn: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
+
+  AWSElementalMediaServiceDelete:
+    Type: "AWS::StepFunctions::StateMachine"
+    Properties:
+      DefinitionString:
+        !Sub
+          - |-
+            {
+              "Comment": "An example of the MediaLive to MediaPackage workflow",
+              "StartAt": "MediaLiveFindChannel",
+              "States": {
+                "MediaLiveFindChannel": {
+                  "Type": "Task",
+                  "Resource": "${medialiveFindChannelArn}",
+                  "InputPath": "$.name",
+                  "ResultPath": "$.medialive.channel",
+                  "Next": "MediaLiveStopChannel"
+                },
+                "MediaLiveStopChannel": {
+                  "Type": "Task",
+                  "Resource": "${medialiveStopChannelArn}",
+                  "InputPath": "$.medialive.channel.Id",
+                  "ResultPath": "$.medialive.channel",
+                  "Next": "SystemsManagerDeleteParameters"
+                },
+                "SystemsManagerDeleteParameters": {
+                  "Type": "Task",
+                  "Resource": "${systemsmanagerDeleteParametersArn}",
+                  "InputPath": "$.name",
+                  "ResultPath": "$.ssm.results",
+                  "Next": "MediaPackageDeleteEndpoints"
+                },
+                "MediaPackageDeleteEndpoints": {
+                  "Type": "Task",
+                  "Resource": "${mediapackageDeleteEndpointsArn}",
+                  "InputPath": "$.name",
+                  "ResultPath": "$.mediapackage.deleteEndpoints",
+                  "Next": "MediaPackageDeleteChannel"
+                },
+                "MediaPackageDeleteChannel": {
+                  "Type": "Task",
+                  "Resource": "${mediapackageDeleteChannelArn}",
+                  "InputPath": "$.name",
+                  "ResultPath": "$.mediapackage.deleteChannel",
+                  "Next": "WaitForIdleState"
+                },
+                "WaitForIdleState": {
+                  "Type": "Wait",
+                  "Seconds": 1,
+                  "Next": "MediaLiveDescribeChannel"
+                },
+                "MediaLiveDescribeChannel": {
+                  "Type": "Task",
+                  "Resource": "${medialiveDescribeChannelArn}",
+                  "InputPath": "$.medialive.channel.Id",
+                  "ResultPath": "$.medialive.channel",
+                  "Next": "IsMediaLiveChannelIdle"
+                },
+                "IsMediaLiveChannelIdle": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.medialive.channel.State",
+                      "StringEquals": "IDLE",
+                      "Next": "MediaLiveDeleteChannel"
+                    }
+                  ],
+                  "Default": "WaitForIdleState"
+                },
+                "MediaLiveDeleteChannel": {
+                  "Type": "Task",
+                  "Resource": "${medialiveDeleteChannelArn}",
+                  "InputPath": "$.medialive.channel.Id",
+                  "ResultPath": "$.medialive.deleteChannelResponse",
+                  "Next": "MediaLiveDeleteInput"
+                },
+                "MediaLiveDeleteInput": {
+                  "Type": "Task",
+                  "Resource": "${medialiveDeleteInputArn}",
+                  "InputPath": "$.medialive.channel.InputAttachments.InputId",
+                  "ResultPath": "$.medialive.deleteInputResponse",
+                  "Next": "Done"
+                },
+                "Done": {
+                  "Type": "Pass",
+                  "End": true
+                }
+              }
+            }
+          - 
+            {
+              mediapackageDeleteChannelArn: !GetAtt [ MediaPackageDeleteChannel, Arn ], 
+              mediapackageDeleteEndpointsArn: !GetAtt [ MediaPackageDeleteEndpoints, Arn ],
+              systemsmanagerDeleteParametersArn: !GetAtt [ SystemsManagerDeleteParameters, Arn ],
+              medialiveDescribeChannelArn: !GetAtt [ MediaLiveDescribeChannel, Arn ],
+              medialiveDeleteInputArn: !GetAtt [ MediaLiveDeleteInput, Arn ],
+              medialiveDeleteChannelArn: !GetAtt [ MediaLiveDeleteChannel, Arn ],
+              medialiveFindChannelArn: !GetAtt [ MediaLiveFindChannel, Arn ],
+              medialiveStopChannelArn: !GetAtt [ MediaLiveStopChannel, Arn ]
             }
       RoleArn: !GetAtt [ AWSElementalMediaServicesRole, Arn ]

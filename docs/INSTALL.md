@@ -2,14 +2,15 @@
 
 ## Basic setup
 
-1. If you choose to self-host the media `mediafunctions.zip` file [located here](../bin/mediafunctions.zip), you should first follow the guide to [update the CFn template to point to the correct S3 bucket location](#updating-s3-bucket). Otherwise you may skip this step.
-2. Go to [the CloudFormation console](http://console.aws.amazon.com/cloudformation) and click "Create Stack".
-3. Upload the [CloudFormation template](../bin/CFnTemplate.yaml) that this library provides, click "Next".
-4. Choose a name for your new Stack, click "Next"
-5. Skip the next page, click "Next"
-6. Check the checkbox to "Acknowledge that AWS CloudFormation might create IAM resources with custom names", click "Create". Wait for the CloudFormation template to be executed and for it to create resources.
-7. Go to the [AWS Step Functions console](https://console.aws.amazon.com/states), click on the newly created Step Function and then click "Start Execution".
-8. A dialog will pop up, prompting you to enter a name and JSON data for the execution. It is not necessary to give the execution a name, but it is important to seed the JSON content with a "name" field. This will be the string that Step Functions uses as a prefix for the different named resources created inside MediaLive, MediaPackage and Systems Manager. The final JSON will look something like:
+1. Go to [the S3 console](http://console.aws.amazon.com/s3). Create a bucket called `awsmediafunctions`.
+2. In the newly-created bucket, upload the `mediafunctions.zip` file [located here](../bin/mediafunctions.zip). The bucket's permissions do not need to be public, this can be kept as a private file in your account alone.
+3. Go to [the CloudFormation console](http://console.aws.amazon.com/cloudformation) and click "Create Stack".
+4. Upload the [CloudFormation template](../bin/CFnTemplate.yaml) that this library provides, click "Next".
+5. Choose a name for your new Stack, click "Next"
+6. Skip the next page, click "Next"
+7. Check the checkbox to "Acknowledge that AWS CloudFormation might create IAM resources with custom names", click "Create". Wait for the CloudFormation template to be executed and for it to create resources.
+8. Go to the [AWS Step Functions console](https://console.aws.amazon.com/states), click on the newly created Step Function and then click "Start Execution".
+9. A dialog will pop up, prompting you to enter a name and JSON data for the execution. It is not necessary to give the execution a name, but it is important to seed the JSON content with a "name" field. This will be the string that Step Functions uses as a prefix for the different named resources created inside MediaLive, MediaPackage and Systems Manager. The final JSON will look something like:
 ```
 {
     "name": "MyMediaFunctions"
@@ -26,6 +27,6 @@ Want to modify the Media functions so that they create different variations of t
 
 ## Updating S3 Bucket
 
-If you want to self-host the Lambda function ZIP file (by default, available here: `https://s3-us-west-2.amazonaws.com/awsmediafunctions/mediafunctions.zip`), then you will need to upload it to S3 and insert that file URL into the CloudFormation template provided by this library. [See how to upload to S3 here.](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/upload-objects.html)
+If you want to modify the Lambda function ZIP file, then you will need to ZIP the files and re-upload it to S3 and insert that file URL into the CloudFormation template provided by this library. [See how to upload to S3 here.](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/upload-objects.html). If you keep the same name, you do not need to update the template.
 
-This is important to do if you want to modify existing or add to the lambda functions contained within the ZIP referenced by CloudFormation.
+It is recommended that you use the same folder and file name that is referenced in the [CloudFormation template](../bin/CFnTemplate.yaml) in multiple places. The bucket name is `awsmediafunctions` and the name of the ZIP file should be `mediafunctions.zip` like [the pre-built mediafunctions.zip in the bin folder](../bin/mediafunctions.zip).
