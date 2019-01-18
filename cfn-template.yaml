@@ -1,77 +1,78 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: "An AWS Elemental Media Services sample stack to build off of."
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Elemental Media Services sample stack to build off of.
 Resources:
   AWSElementalMediaServicesRole:
-    Type: "AWS::IAM::Role"
+    Type: AWS::IAM::Role
     Properties:
-      RoleName: "AWSElementalMediaServicesRole"
+      RoleName: AWSElementalMediaServicesRole
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
               Service: lambda.amazonaws.com
-            Action: "sts:AssumeRole"
-          - Effect: "Allow"
+            Action: sts:AssumeRole
+          - Effect: Allow
             Principal:
               Service:
                 - !Sub states.${AWS::Region}.amazonaws.com
-            Action: "sts:AssumeRole"
-          - Effect: "Allow"
+            Action: sts:AssumeRole
+          - Effect: Allow
             Principal:
               Service: medialive.amazonaws.com
-            Action: "sts:AssumeRole"
+            Action: sts:AssumeRole
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/AWSElementalMediaPackageFullAccess"
-        - "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
-        - "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
+        - arn:aws:iam::aws:policy/AWSElementalMediaPackageFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
       Policies:
         - PolicyName: MediaLiveCustomPolicy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: "medialive:*"
-                Resource: "*"
+                Action: medialive:*
+                Resource: '*'
               - Effect: Allow
                 Action:
-                  - "s3:ListBucket"
-                  - "s3:PutObject"
-                  - "s3:GetObject"
-                  - "s3:DeleteObject"
-                Resource: "*"
+                  - s3:ListBucket
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                Resource: '*'
               - Effect: Allow
                 Action:
-                  - "mediastore:ListContainers"
-                  - "mediastore:PutObject"
-                  - "mediastore:GetObject"
-                  - "mediastore:DeleteObject"
-                  - "mediastore:DescribeObject"
-                Resource: "*"
+                  - mediastore:ListContainers
+                  - mediastore:PutObject
+                  - mediastore:GetObject
+                  - mediastore:DeleteObject
+                  - mediastore:DescribeObject
+                Resource: '*'
               - Effect: Allow
                 Action:
-                  - "logs:CreateLogGroup"
-                  - "logs:CreateLogStream"
-                  - "logs:PutLogEvents"
-                  - "logs:DescribeLogStreams"
-                  - "logs:DescribeLogGroups"
-                Resource: "*"
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                  - logs:DescribeLogGroups
+                Resource: '*'
         - PolicyName: IAMCustomPolicy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action: "iam:PassRole"
-                Resource: "*"
+                Action: iam:PassRole
+                Resource: '*'
                 
   MediaLiveAttachRole:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Lambda::Function
     Properties:
-      FunctionName: "MediaLiveAttachRole"
-      Handler: "index.handler"
+      FunctionName: MediaLiveAttachRole
+      Handler: index.handler
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
       Code:
-        "ZipFile":  { "Fn::Join": ["", [
+        ZipFile:  { "Fn::Join": ["", [
           "exports.handler = function(event, context, callback){ callback(null, '",
           !GetAtt [ AWSElementalMediaServicesRole, Arn ],
           "'); };"
@@ -80,184 +81,139 @@ Resources:
       Timeout: "30"
 
   MediaPackageCreateChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaPackageCreateChannel"
-      Handler: "mediapackage.createChannel"
+      Handler: mediapackage.createChannel
+      CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaPackageCreateEndpoints:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaPackageCreateEndpoints"
-      Handler: "mediapackage.createEndpoints"
+      Handler: mediapackage.createEndpoints
+      CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaPackageDeleteChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaPackageDeleteChannel"
-      Handler: "mediapackage.deleteChannel"
+      Handler: mediapackage.deleteChannel
+      CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaPackageDeleteEndpoints:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaPackageDeleteEndpoints"
-      Handler: "mediapackage.deleteEndpoints"
+      Handler: mediapackage.deleteEndpoints
+      CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
 
   SystemsManagerCreateParameters:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "SystemsManagerCreateParameters"
-      Handler: "systemsmanager.createParameters"
+      Handler: systemsmanager.createParameters
+      CodeUri: ./lib/systemsmanager.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   SystemsManagerDeleteParameters:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "SystemsManagerDeleteParameters"
-      Handler: "systemsmanager.deleteParameters"
+      Handler: systemsmanager.deleteParameters
+      CodeUri: ./lib/systemsmanager.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveCreateInput:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveCreateInput"
-      Handler: "medialive.createInput"
+      Handler: medialive.createInput
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveCreateChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveCreateChannel"
-      Handler: "medialive.createChannel"
+      Handler: medialive.createChannel
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveDescribeChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveDescribeChannel"
-      Handler: "medialive.describeChannel"
+      Handler: medialive.describeChannel
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveDescribeInput:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveDescribeInput"
-      Handler: "medialive.describeInput"
+      Handler: medialive.describeInput
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveStartChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveStartChannel"
-      Handler: "medialive.startChannel"
+      Handler: medialive.startChannel
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveStopChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveStopChannel"
-      Handler: "medialive.stopChannel"
+      Handler: medialive.stopChannel
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveFindChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveFindChannel"
-      Handler: "medialive.findChannel"
+      Handler: medialive.findChannel
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveDeleteChannel:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveDeleteChannel"
-      Handler: "medialive.deleteChannel"
+      Handler: medialive.deleteChannel
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
       
   MediaLiveDeleteInput:
-    Type: "AWS::Lambda::Function"
+    Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "MediaLiveDeleteInput"
-      Handler: "medialive.deleteInput"
+      Handler: medialive.deleteInput
+      CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Code:
-        S3Bucket: "awsmediafunctions"
-        S3Key: "mediafunctions.zip"
-      Runtime: "nodejs8.10"
-      Timeout: "30"
+      Runtime: nodejs8.10
+      Timeout: 30
 
   AWSElementalMediaServiceCreate:
     Type: "AWS::StepFunctions::StateMachine"
@@ -383,7 +339,7 @@ Resources:
       RoleArn: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
 
   AWSElementalMediaServiceDelete:
-    Type: "AWS::StepFunctions::StateMachine"
+    Type: AWS::StepFunctions::StateMachine
     Properties:
       DefinitionString:
         !Sub
@@ -425,9 +381,9 @@ Resources:
                   "Resource": "${mediapackageDeleteChannelArn}",
                   "InputPath": "$.name",
                   "ResultPath": "$.mediapackage.deleteChannel",
-                  "Next": "WaitForIdleState"
+                  "Next": "WaitForChannelIdleState"
                 },
-                "WaitForIdleState": {
+                "WaitForChannelIdleState": {
                   "Type": "Wait",
                   "Seconds": 1,
                   "Next": "MediaLiveDescribeChannel"
@@ -448,19 +404,42 @@ Resources:
                       "Next": "MediaLiveDeleteChannel"
                     }
                   ],
-                  "Default": "WaitForIdleState"
+                  "Default": "WaitForChannelIdleState"
                 },
                 "MediaLiveDeleteChannel": {
                   "Type": "Task",
                   "Resource": "${medialiveDeleteChannelArn}",
                   "InputPath": "$.medialive.channel.Id",
                   "ResultPath": "$.medialive.deleteChannelResponse",
-                  "Next": "MediaLiveDeleteInput"
+                  "Next": "WaitForInputDetachedState"
+                },
+                "WaitForInputDetachedState": {
+                  "Type": "Wait",
+                  "Seconds": 1,
+                  "Next": "MediaLiveDescribeInput"
+                },
+                "MediaLiveDescribeInput": {
+                  "Type": "Task",
+                  "Resource": "${medialiveDescribeInputArn}",
+                  "InputPath": "$.medialive.channel.InputAttachments[0].InputId",
+                  "ResultPath": "$.medialive.input",
+                  "Next": "IsMediaLiveInputDetached"
+                },
+                "IsMediaLiveInputDetached": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.medialive.input.State",
+                      "StringEquals": "DETACHED",
+                      "Next": "MediaLiveDeleteInput"
+                    }
+                  ],
+                  "Default": "WaitForInputDetachedState"
                 },
                 "MediaLiveDeleteInput": {
                   "Type": "Task",
                   "Resource": "${medialiveDeleteInputArn}",
-                  "InputPath": "$.medialive.channel.InputAttachments.InputId",
+                  "InputPath": "$.medialive.channel.InputAttachments[0].InputId",
                   "ResultPath": "$.medialive.deleteInputResponse",
                   "Next": "Done"
                 },
@@ -476,6 +455,7 @@ Resources:
               mediapackageDeleteEndpointsArn: !GetAtt [ MediaPackageDeleteEndpoints, Arn ],
               systemsmanagerDeleteParametersArn: !GetAtt [ SystemsManagerDeleteParameters, Arn ],
               medialiveDescribeChannelArn: !GetAtt [ MediaLiveDescribeChannel, Arn ],
+              medialiveDescribeInputArn: !GetAtt [ MediaLiveDescribeInput, Arn ],
               medialiveDeleteInputArn: !GetAtt [ MediaLiveDeleteInput, Arn ],
               medialiveDeleteChannelArn: !GetAtt [ MediaLiveDeleteChannel, Arn ],
               medialiveFindChannelArn: !GetAtt [ MediaLiveFindChannel, Arn ],
