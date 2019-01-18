@@ -10,7 +10,7 @@ Media Services Factory can be used to write [AWS Step Functions](https://console
 
 ## Why would I use this?
 
-It's complex, as well as tedious, to stand up a complete end-to-end production video workflow in testing or production--sometimes taking hours if not days to configure completely. This package allows you to templatize those workflows, standing up those resources pre-configured to suit your needs, in much less time than it would take for a human to do those tasks, and in an automatable way.
+It's complex as well as time-consuming, to stand up a complete end-to-end production video workflow in testing or production. It sometimes taking hours if not days to configure one of these workflows completely. This package allows you to templatize those workflows, standing up those resources pre-configured to suit your needs, in much less time than it would take for a human to do those tasks, and in an automatable way.
 
 ## How do I use it?
 
