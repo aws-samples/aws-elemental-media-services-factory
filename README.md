@@ -10,7 +10,7 @@ Media Services Factory can be used to write [AWS Step Functions](https://console
 
 ## Why would I use this?
 
-It's complex, as well as tedious, to stand up a complete end-to-end production video workflow in testing or production, sometimes taking hours if not days to configure completely. This package allows you to templatize those workflows, standing up those resources pre-configured to suit your needs, in much less time than it would take for a human to do those tasks, and in an automatable way.
+It's complex, as well as tedious, to stand up a complete end-to-end production video workflow in testing or production--sometimes taking hours if not days to configure completely. This package allows you to templatize those workflows, standing up those resources pre-configured to suit your needs, in much less time than it would take for a human to do those tasks, and in an automatable way.
 
 ## How do I use it?
 
@@ -19,9 +19,9 @@ You must have an AWS developer account, log into the AWS console, and then [foll
 The basic workflow is:
 - Execute CloudFormation template
 - Run a step function to create the media resources
-- Playback your channel!
+- Play back your channel!
 
-The CloudFormation template will deploy all the necessary permissions, Lambda functions, and a sample Step Function state machine that you can use as an example to follow [to create your own custom workflows](docs/ADVANCED.md#lambda-functions).
+The CloudFormation template will deploy all the necessary permissions, Lambda functions, and two sample Step Function state machines that you can use as an example to follow [to create your own custom workflows](docs/ADVANCED.md#lambda-functions).
 
 ## Where do I start?
 
