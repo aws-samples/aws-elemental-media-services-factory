@@ -77,7 +77,7 @@ Resources:
           !GetAtt [ AWSElementalMediaServicesRole, Arn ],
           "'); };"
         ]]}
-      Runtime: "nodejs8.10"
+      Runtime: "nodejs10.x"
       Timeout: "30"
 
   MediaPackageCreateChannel:
@@ -86,7 +86,7 @@ Resources:
       Handler: mediapackage.createChannel
       CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaPackageCreateEndpoints:
@@ -95,7 +95,7 @@ Resources:
       Handler: mediapackage.createEndpoints
       CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaPackageDeleteChannel:
@@ -104,7 +104,7 @@ Resources:
       Handler: mediapackage.deleteChannel
       CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaPackageDeleteEndpoints:
@@ -113,7 +113,7 @@ Resources:
       Handler: mediapackage.deleteEndpoints
       CodeUri: ./lib/mediapackage.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
 
   SystemsManagerCreateParameters:
@@ -122,7 +122,7 @@ Resources:
       Handler: systemsmanager.createParameters
       CodeUri: ./lib/systemsmanager.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   SystemsManagerDeleteParameters:
@@ -131,7 +131,7 @@ Resources:
       Handler: systemsmanager.deleteParameters
       CodeUri: ./lib/systemsmanager.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveCreateInput:
@@ -140,7 +140,7 @@ Resources:
       Handler: medialive.createInput
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveCreateChannel:
@@ -149,7 +149,7 @@ Resources:
       Handler: medialive.createChannel
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveDescribeChannel:
@@ -158,7 +158,7 @@ Resources:
       Handler: medialive.describeChannel
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveDescribeInput:
@@ -167,7 +167,7 @@ Resources:
       Handler: medialive.describeInput
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveStartChannel:
@@ -176,7 +176,7 @@ Resources:
       Handler: medialive.startChannel
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveStopChannel:
@@ -185,7 +185,7 @@ Resources:
       Handler: medialive.stopChannel
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveFindChannel:
@@ -194,7 +194,7 @@ Resources:
       Handler: medialive.findChannel
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveDeleteChannel:
@@ -203,7 +203,7 @@ Resources:
       Handler: medialive.deleteChannel
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       
   MediaLiveDeleteInput:
@@ -212,7 +212,7 @@ Resources:
       Handler: medialive.deleteInput
       CodeUri: ./lib/medialive.js
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
 
   AWSElementalMediaServiceCreate:
