@@ -8,7 +8,7 @@
 ## Basic setup
 
 1. Build the CloudFormation template\
-`aws cloudformation package --template-file ./bin/CFnTemplate.yaml --s3-bucket <<s3-bucket-name>> --output-template-file cfn-template-out.yaml`
+`aws cloudformation package --template-file cfn-template.yaml --s3-bucket <<s3-bucket-name>> --output-template-file cfn-template-out.yaml`
 2. Deploy the build CloudFormation template\
 `aws cloudformation create-stack --stack-name <<stack-name>> --template-body file://cfn-template-out.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND`
 3. All functionality has now been deployed, setup has been completed. Go to the [next section](#creating-medialive-+-mediapackage-video-resources) to learn how to create a video workflow from this stack.

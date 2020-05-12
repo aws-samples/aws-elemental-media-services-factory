@@ -4,7 +4,7 @@ Once you have gone through the basic setup, and you would like to begin explorin
 
 ## CloudFormation Template
 
-The [CloudFormation Template](../bin/CFnTemplate.yaml) located in this package is meant as a way to bootstrap a given AWS account with the resources and permissions necessary to author media workflows via StepFunctions. __It is not the job of the CFn template to actually author the MediaPackage and MediaLive resources__. 
+The [CloudFormation Template](cfn-template.yaml) located in this package is meant as a way to bootstrap a given AWS account with the resources and permissions necessary to author media workflows via StepFunctions. __It is not the job of the CFn template to actually author the MediaPackage and MediaLive resources__. 
 
 One of the reasons for needing the CloudFormation template to create a Step Function state machine in the first place is because MediaLive and MediaPackage both don't support CloudFormation directly. The workaround for this that we use is to deploy a CloudFormation template with a Step Function state machine that then mimics the behavior of CloudFormation by using composable Lambda functions. This also is a an optimization because it allows more natural level of asyncronous coordination when spinning up a Media Service stack in ways that CloudFormation doesn't support even if MediaLive and MediaPackage were to natively support CloudFormation.
 
@@ -22,7 +22,7 @@ These functions atomically perform operations like creating a MediaPackage endpo
 
 Note that when you make changes to any resource you will need to rebuild and re-deploy the CloudFormation template so that it can pick up your changes. To do so, run the following:
 1. Rebuild the stack\
-`aws cloudformation package --template-file ./bin/CFnTemplate.yaml --s3-bucket <<s3-bucket-name>> --output-template-file cfn-template-out.yaml`
+`aws cloudformation package --template-file cfn-template.yaml --s3-bucket <<s3-bucket-name>> --output-template-file cfn-template-out.yaml`
 2. Re-deploy the stack\
 `aws cloudformation update-stack --stack-name <<stack-name>> --template-body file://cfn-template-out.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND`
 
