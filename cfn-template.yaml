@@ -72,11 +72,12 @@ Resources:
       Handler: index.handler
       Role: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
       Code:
-        ZipFile:  { "Fn::Join": ["", [
-          "exports.handler = function(event, context, callback){ callback(null, '",
-          !GetAtt [ AWSElementalMediaServicesRole, Arn ],
-          "'); };"
-        ]]}
+        ZipFile:
+          !Join
+            - ''
+            - - "exports.handler = function(event, context, callback){ callback(null, '"
+              - Fn::GetAtt: [AWSElementalMediaServicesRole, Arn]
+              - "'); };"
       Runtime: "nodejs12.x"
       Timeout: "30"
 
@@ -325,17 +326,14 @@ Resources:
                 }
               }
             }
-          - 
-            {
-              mediapackageCreateChannelArn: !GetAtt [ MediaPackageCreateChannel, Arn ], 
-              mediapackageCreateEndpointsArn: !GetAtt [ MediaPackageCreateEndpoints, Arn ],
-              systemsmanagerCreateParametersArn: !GetAtt [ SystemsManagerCreateParameters, Arn ],
-              medialiveAttachRoleArn: !GetAtt [ MediaLiveAttachRole, Arn ],
-              medialiveCreateInputArn: !GetAtt [ MediaLiveCreateInput, Arn ],
-              medialiveCreateChannelArn: !GetAtt [ MediaLiveCreateChannel, Arn ],
-              medialiveDescribeChannelArn: !GetAtt [ MediaLiveDescribeChannel, Arn ],
-              medialiveStartChannelArn: !GetAtt [ MediaLiveStartChannel, Arn ]
-            }
+          - mediapackageCreateChannelArn: !GetAtt MediaPackageCreateChannel.Arn
+            systemsmanagerCreateParametersArn: !GetAtt SystemsManagerCreateParameters.Arn
+            mediapackageCreateEndpointsArn: !GetAtt MediaPackageCreateEndpoints.Arn
+            medialiveAttachRoleArn: !GetAtt MediaLiveAttachRole.Arn
+            medialiveCreateInputArn: !GetAtt MediaLiveCreateInput.Arn
+            medialiveCreateChannelArn: !GetAtt MediaLiveCreateChannel.Arn
+            medialiveDescribeChannelArn: !GetAtt MediaLiveDescribeChannel.Arn
+            medialiveStartChannelArn: !GetAtt MediaLiveStartChannel.Arn
       RoleArn: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
 
   AWSElementalMediaServiceDelete:
@@ -449,16 +447,13 @@ Resources:
                 }
               }
             }
-          - 
-            {
-              mediapackageDeleteChannelArn: !GetAtt [ MediaPackageDeleteChannel, Arn ], 
-              mediapackageDeleteEndpointsArn: !GetAtt [ MediaPackageDeleteEndpoints, Arn ],
-              systemsmanagerDeleteParametersArn: !GetAtt [ SystemsManagerDeleteParameters, Arn ],
-              medialiveDescribeChannelArn: !GetAtt [ MediaLiveDescribeChannel, Arn ],
-              medialiveDescribeInputArn: !GetAtt [ MediaLiveDescribeInput, Arn ],
-              medialiveDeleteInputArn: !GetAtt [ MediaLiveDeleteInput, Arn ],
-              medialiveDeleteChannelArn: !GetAtt [ MediaLiveDeleteChannel, Arn ],
-              medialiveFindChannelArn: !GetAtt [ MediaLiveFindChannel, Arn ],
-              medialiveStopChannelArn: !GetAtt [ MediaLiveStopChannel, Arn ]
-            }
+          - mediapackageDeleteChannelArn: !GetAtt MediaPackageDeleteChannel.Arn
+            mediapackageDeleteEndpointsArn: !GetAtt MediaPackageDeleteEndpoints.Arn
+            systemsmanagerDeleteParametersArn: !GetAtt SystemsManagerDeleteParameters.Arn
+            medialiveDescribeChannelArn: !GetAtt MediaLiveDescribeChannel.Arn
+            medialiveDescribeInputArn: !GetAtt MediaLiveDescribeInput.Arn
+            medialiveDeleteInputArn: !GetAtt MediaLiveDeleteInput.Arn
+            medialiveDeleteChannelArn: !GetAtt MediaLiveDeleteChannel.Arn
+            medialiveFindChannelArn: !GetAtt MediaLiveFindChannel.Arn
+            medialiveStopChannelArn: !GetAtt MediaLiveStopChannel.Arn
       RoleArn: !GetAtt [ AWSElementalMediaServicesRole, Arn ]
